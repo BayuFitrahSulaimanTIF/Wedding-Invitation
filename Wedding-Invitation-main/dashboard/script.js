@@ -246,6 +246,45 @@
   updateCountdown();
   setInterval(updateCountdown, 1000);
 
+  // 14. Musik backsound
+  const musicToggle = $('#musicToggle');
+  const musicIcon = $('#musicIcon');
+  const backsound = $('#backsound');
+  const musicPlayIcon = 'assets/music-note.svg';
+  const musicMuteIcon = 'assets/music-note-muted.svg';
+  let musicPlaying = true;
+  try {
+    const savedTime = parseFloat(sessionStorage.getItem('backsoundTime') || '0');
+    const savedPlaying = sessionStorage.getItem('backsoundPlaying');
+    if (!isNaN(savedTime)) backsound.currentTime = savedTime;
+    if (savedPlaying === 'false') musicPlaying = false;
+  } catch (e) {}
+  const setMusicPlaying = (next) => {
+    musicPlaying = next;
+    if (musicPlaying) {
+  backsound.play().catch(() => { musicPlaying = false; });
+      musicIcon.src = musicPlayIcon;
+    } else {
+      backsound.pause();
+      musicIcon.src = musicMuteIcon;
+    }
+  };
+      backsound.play().catch(() => { musicPlaying = false; });
+  musicToggle.addEventListener('click', () => setMusicPlaying(!musicPlaying));
+  const saveMusicState = () => {
+    try {
+      sessionStorage.setItem('backsoundTime', String(backsound.currentTime || 0));
+      sessionStorage.setItem('backsoundPlaying', String(musicPlaying));
+    } catch (e) {}
+  };
+  const startMusicOnInteraction = () => {
+    if (!musicPlaying) setMusicPlaying(true);
+  };
+  document.addEventListener('click', startMusicOnInteraction, { once: true });
+  document.addEventListener('touchstart', startMusicOnInteraction, { once: true });
+  window.addEventListener('pagehide', saveMusicState);
+  setInterval(saveMusicState, 1000);
+
   // 14. Self-test melalui parameter URL
   if (location.search.includes('selftest')) {
     const cases = [['', true], ['  ', true], [null, true], ['0', false], [' Muhammad ', false]];
