@@ -253,16 +253,25 @@
   const musicPlayIcon = 'assets/music-note.svg';
   const musicMuteIcon = 'assets/music-note-muted.svg';
   let musicPlaying = true;
+  const restoreMusicTime = () => {
+    try {
+      const savedTime = parseFloat(sessionStorage.getItem('backsoundTime') || '0');
+      if (!isNaN(savedTime)) backsound.currentTime = savedTime;
+    } catch (e) {}
+  };
   try {
-    const savedTime = parseFloat(sessionStorage.getItem('backsoundTime') || '0');
     const savedPlaying = sessionStorage.getItem('backsoundPlaying');
-    if (!isNaN(savedTime)) backsound.currentTime = savedTime;
     if (savedPlaying === 'false') musicPlaying = false;
   } catch (e) {}
+  if (backsound.readyState >= 1) {
+    restoreMusicTime();
+  } else {
+    backsound.addEventListener('loadedmetadata', restoreMusicTime, { once: true });
+  }
   const setMusicPlaying = (next) => {
     musicPlaying = next;
     if (musicPlaying) {
-  backsound.play().catch(() => { musicPlaying = false; });
+  backsound.play().catch(() => {});
       musicIcon.src = musicPlayIcon;
     } else {
       backsound.pause();
@@ -270,7 +279,7 @@
     }
   };
       musicIcon.src = musicPlaying ? musicPlayIcon : musicMuteIcon;
-      if (musicPlaying) backsound.play().catch(() => { musicPlaying = false; musicIcon.src = musicMuteIcon; });
+      if (musicPlaying) backsound.play().catch(() => {});
   musicToggle.addEventListener('click', () => setMusicPlaying(!musicPlaying));
   const saveMusicState = () => {
     try {
@@ -279,7 +288,9 @@
     } catch (e) {}
   };
   const startMusicOnInteraction = () => {
-    if (!musicPlaying) setMusicPlaying(true);
+    if (musicPlaying) {
+      backsound.play().catch(() => {});
+    }
   };
   document.addEventListener('click', startMusicOnInteraction, { once: true });
   document.addEventListener('touchstart', startMusicOnInteraction, { once: true });

@@ -97,7 +97,7 @@
 
   <p class="page-signature" aria-hidden="true">A MOMENT TO REMEMBER</p>
 </main>
-<audio id="backsound" src="Wedding-Invitation-main/dashboard/assets/backsound/turkey-synth-pop-music.mp3" autoplay loop></audio>
+<audio id="backsound" src="Wedding-Invitation-main/dashboard/assets/backsound/turkey-synth-pop-music.mp3" loop></audio>
 <button id="musicToggle" type="button" aria-label="Putar atau hentikan musik" style="position:fixed;right:16px;bottom:16px;z-index:60;width:48px;height:48px;border:1px solid #6f7f63;border-radius:50%;background:#69795e;color:#fffdf7;display:grid;place-items:center;cursor:pointer;">
   <img id="musicIcon" src="Wedding-Invitation-main/dashboard/assets/music-note.svg" alt="" width="24" height="24">
 </button>
@@ -110,16 +110,10 @@
     const playIcon = 'Wedding-Invitation-main/dashboard/assets/music-note.svg';
     const muteIcon = 'Wedding-Invitation-main/dashboard/assets/music-note-muted.svg';
     let playing = true;
-    try {
-      const savedPlaying = sessionStorage.getItem('backsoundPlaying');
-      const savedTime = parseFloat(sessionStorage.getItem('backsoundTime') || '0');
-      if (savedPlaying === 'false') playing = false;
-      if (!isNaN(savedTime)) audio.currentTime = savedTime;
-    } catch (e) {}
     function setPlaying(next) {
       playing = next;
       if (playing) {
-    audio.play().catch(function () { playing = false; });
+    audio.play().catch(function () {});
         icon.src = playIcon;
       } else {
         audio.pause();
@@ -127,7 +121,7 @@
       }
     }
     icon.src = playing ? playIcon : muteIcon;
-    if (playing) audio.play().catch(function () { playing = false; icon.src = muteIcon; });
+    if (playing) audio.play().catch(function () {});
     button.addEventListener('click', function () { setPlaying(!playing); });
     function saveMusicState() {
       try {
@@ -136,7 +130,9 @@
       } catch (e) {}
     }
     function startOnInteraction() {
-      if (!playing) setPlaying(true);
+      if (playing) {
+        audio.play().catch(function () {});
+      }
     }
     document.addEventListener('click', startOnInteraction, { once: true });
     document.addEventListener('touchstart', startOnInteraction, { once: true });
