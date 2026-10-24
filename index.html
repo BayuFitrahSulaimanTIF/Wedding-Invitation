@@ -110,6 +110,12 @@
     const playIcon = 'Wedding-Invitation-main/dashboard/assets/music-note.svg';
     const muteIcon = 'Wedding-Invitation-main/dashboard/assets/music-note-muted.svg';
     let playing = true;
+    try {
+      const savedPlaying = sessionStorage.getItem('backsoundPlaying');
+      const savedTime = parseFloat(sessionStorage.getItem('backsoundTime') || '0');
+      if (savedPlaying === 'false') playing = false;
+      if (!isNaN(savedTime)) audio.currentTime = savedTime;
+    } catch (e) {}
     function setPlaying(next) {
       playing = next;
       if (playing) {
@@ -120,7 +126,8 @@
         icon.src = muteIcon;
       }
     }
-    audio.play().catch(function () { playing = false; });
+    icon.src = playing ? playIcon : muteIcon;
+    if (playing) audio.play().catch(function () { playing = false; icon.src = muteIcon; });
     button.addEventListener('click', function () { setPlaying(!playing); });
     function saveMusicState() {
       try {

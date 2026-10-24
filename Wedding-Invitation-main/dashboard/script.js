@@ -269,7 +269,8 @@
       musicIcon.src = musicMuteIcon;
     }
   };
-      backsound.play().catch(() => { musicPlaying = false; });
+      musicIcon.src = musicPlaying ? musicPlayIcon : musicMuteIcon;
+      if (musicPlaying) backsound.play().catch(() => { musicPlaying = false; musicIcon.src = musicMuteIcon; });
   musicToggle.addEventListener('click', () => setMusicPlaying(!musicPlaying));
   const saveMusicState = () => {
     try {
